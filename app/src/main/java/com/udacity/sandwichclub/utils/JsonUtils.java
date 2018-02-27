@@ -11,35 +11,45 @@ import java.util.List;
 
 public class JsonUtils {
 
+    public static final String JSON_NAME="name";
+    public static final String JSON_MAIN_NAME="mainName";
+    public static final String JSON_ALSO_KNOWN_AS="alsoKnownAs";
+    public static final String JSON_PLACE_OF_ORIGIN="placeOfOrigin";
+    public static final String JSON_DESCRIPTION="description";
+    public static final String JSON_INGREDIENTS="ingredients";
+    public static final String JSON_IMAGE= "image";
+
     public static Sandwich parseSandwichJson(String json) throws JSONException {
 
+
+        //Create JSON object from passed string
         JSONObject reader = new JSONObject(json);
 
-        JSONObject name = reader.getJSONObject("name");
-        String mainName= name.getString("mainName");
 
-        JSONArray akaJsonArray = name.getJSONArray("alsoKnownAs");
-        List<String> akas= new ArrayList<>();
+        //Start grabbing JSON info to variables
+        JSONObject name = reader.getJSONObject(JSON_NAME);
 
-        for (int i = 0; i<akaJsonArray.length();i++){
-            String akaString= akaJsonArray.getString(i);
-            akas.add(akaString);
+        //Changed getString for optString
+        String mainName= name.optString(JSON_MAIN_NAME);
+        String placeOfOrigin=  reader.optString(JSON_PLACE_OF_ORIGIN);
+        String description= reader.optString(JSON_DESCRIPTION);
+        String image= reader.optString(JSON_IMAGE);
+
+
+        //Go through the 2 arrays and add it's info to list objects
+        JSONArray alsoKnownAsJsonArray = name.getJSONArray(JSON_ALSO_KNOWN_AS);
+        List<String> alsoKnownAsList= new ArrayList<>();
+        for (int i = 0; i<alsoKnownAsJsonArray.length();i++){
+            alsoKnownAsList.add(alsoKnownAsJsonArray.getString(i));
         }
 
-        String placeOfOrigin=  reader.getString("placeOfOrigin");
-
-        String description= reader.getString("description");
-        String image= reader.getString("image");
-
-        JSONArray ingredientsJsonArray= reader.getJSONArray("ingredients");
+        JSONArray ingredientsJsonArray= reader.getJSONArray(JSON_INGREDIENTS);
         List<String> ingredients= new ArrayList<>();
         for (int i=0; i<ingredientsJsonArray.length(); i++){
-            String ingredient= ingredientsJsonArray.getString(i);
-            ingredients.add(ingredient);
+            ingredients.add(ingredientsJsonArray.getString(i));
         }
-        Sandwich detailSandwich= new Sandwich(mainName,akas,placeOfOrigin,description,image,ingredients);
 
-
-        return detailSandwich;
+        //Create the sandwich object
+        return new Sandwich(mainName,alsoKnownAsList,placeOfOrigin,description,image,ingredients);
     }
 }
